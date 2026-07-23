@@ -22,10 +22,13 @@ jobs:
             -e POSTGRES_USER=appuser -e POSTGRES_PASSWORD=apppass -e POSTGRES_DB=appdb \
             postgres:17
           sleep 8
-          docker cp webapp/db/init.sql appdb:/init.sql
-          docker cp webapp/db/100k-most-used-passwords-NCSC.txt appdb:/100k-most-used-passwords-NCSC.txt
-          docker exec appdb bash -c "sed -i 's#/docker-entrypoint-initdb.d/##' /init.sql"
-          docker exec -e PGPASSWORD=apppass appdb psql -U appuser -d appdb -f /init.sql
+          docker exec appdb mkdir -p /docker-entrypoint-initdb.d
+          docker cp webapp/db/init.sql appdb:/docker-entrypoint-initdb.d/init.sql
+          docker cp webapp/db/100k-most-used-passwords-NCSC.txt appdb:/docker-entrypoint-initdb.d/100k-most-used-passwords-NCSC.txt
+          docker exec -e PGPASSWORD=apppass appdb psql -U appuser -d appdb -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/init.sql
+
+      - name: Verify password list loaded
+            run: docker exec -e PGPASSWORD=apppass appdb psql -U appuser -d appdb -t -c "SELECT COUNT(*) FROM common_passwords;"
 
       - name: Run integration tests
         run: npm test -- tests/integration.test.js
