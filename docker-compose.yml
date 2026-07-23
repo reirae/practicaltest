@@ -21,6 +21,8 @@ services:
   appdb:
     image: postgres:17
     container_name: app-db
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: apppass
