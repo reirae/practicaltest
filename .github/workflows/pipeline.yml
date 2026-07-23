@@ -28,7 +28,7 @@ jobs:
           docker exec -e PGPASSWORD=apppass appdb psql -U appuser -d appdb -v ON_ERROR_STOP=1 -f /docker-entrypoint-initdb.d/init.sql
 
       - name: Verify password list loaded
-            run: docker exec -e PGPASSWORD=apppass appdb psql -U appuser -d appdb -t -c "SELECT COUNT(*) FROM common_passwords;"
+        run: docker exec -e PGPASSWORD=apppass appdb psql -U appuser -d appdb -t -c "SELECT COUNT(*) FROM common_passwords;"
 
       - name: Run integration tests
         run: npm test -- tests/integration.test.js
