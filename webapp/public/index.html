@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <p id="error-msg" style="color: red;"></p>
+
+  <form action="/login" method="get">
+    <label>Username: <input type="text" name="username" required></label><br>
+    <label>Password: <input type="password" name="password" required></label><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <p><a href="/signup.html">Create an account</a></p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    if (error) document.getElementById('error-msg').textContent = error;
+  </script>
+</body>
+</html>

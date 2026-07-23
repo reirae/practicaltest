@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome</title>
+</head>
+<body>
+  <h1 id="welcome-msg">Welcome!</h1>
+  <p id="pwd-msg"></p>
+  <a href="/index.html"><button>Logout</button></a>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const user = params.get('user');
+    const pwd = params.get('pwd');
+    document.getElementById('welcome-msg').textContent = `Welcome, ${user}!`;
+    document.getElementById('pwd-msg').textContent = `Your password: ${pwd}`;
+  </script>
+</body>
+</html>

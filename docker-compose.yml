@@ -1,0 +1,74 @@
+services:
+  # ---------- Q1/Q2/Q4: the web app itself, serving HTTPS with a self-signed cert ----------
+  webapp:
+    build: ./webapp
+    container_name: webapp
+    ports:
+      - "443:443"   # https://127.0.0.1/
+      - "8080:8080" # plain http, used by Q5 GitHub Actions UI test ("over http")
+    volumes:
+      - ./certs:/certs:ro
+    environment:
+      DB_HOST: appdb
+      DB_USER: appuser
+      DB_PASSWORD: apppass
+      DB_NAME: appdb
+    depends_on:
+      - appdb
+    restart: unless-stopped
+
+  # ---------- Q4.5: database storing common passwords + the "2402725" users table ----------
+  appdb:
+    image: postgres:17
+    container_name: app-db
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppass
+      POSTGRES_DB: appdb
+    volumes:
+      - appdb_data:/var/lib/postgresql/data
+      - ./webapp/db/init.sql:/docker-entrypoint-initdb.d/1-init.sql:ro
+      - ./webapp/db/100k-most-used-passwords-NCSC.txt:/docker-entrypoint-initdb.d/100k-most-used-passwords-NCSC.txt:ro
+
+  # ---------- Q3: local git server ----------
+  git-server:
+    build:
+      context: .
+      dockerfile: gitserver.Dockerfile
+    container_name: git-server
+    ports:
+      - "3000:3000"
+
+  # ---------- Q7: SonarQube ----------
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    depends_on:
+      - sonar-db
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonar-db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+  sonar-db:
+    image: postgres:17
+    container_name: sonar-db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - sonar_postgresql:/var/lib/postgresql/data
+
+volumes:
+  appdb_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonar_postgresql:

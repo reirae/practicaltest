@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Account</title>
+</head>
+<body>
+  <h1>Create Account</h1>
+  <p id="msg" style="color: red;"></p>
+
+  <form id="signup-form" action="/signup" method="post">
+    <label>Username: <input type="text" id="username" name="username" required></label><br>
+    <label>Password: <input type="password" id="password" name="password" required></label><br>
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <script src="validate.js"></script>
+  <script>
+    // Q4.2: frontend function to verify the password against the OWASP C7
+    // password requirements before letting the form submit.
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const result = await validatePassword(username, password);
+      if (!result.valid) {
+        document.getElementById('msg').textContent = result.reason;
+        return; // Q4.7: stay on this page (equivalent to remaining at home) if invalid
+      }
+      e.target.submit(); // valid -> let the real POST /signup happen (backend re-checks, Q4.3)
+    });
+  </script>
+</body>
+</html>
