@@ -1,6 +1,6 @@
-const fs = require('fs');
-const https = require('https');
-const http = require('http');
+const fs = require('node:fs');
+const https = require('node:https');
+const http = require('node:http');
 const app = require('./app');
 
 const HTTPS_PORT = 443;
